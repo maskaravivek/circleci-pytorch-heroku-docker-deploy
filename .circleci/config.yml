@@ -1,0 +1,37 @@
+version: 2.1
+orbs:
+  python: circleci/python@2.1.1
+
+workflows:
+  build-app-with-test:
+    jobs:
+      - build-and-test
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.9
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: pip
+      - python/install-packages:
+          pip-dependency-file: requirements.txt
+          pkg-manager: pip
+      - python/install-packages:
+          args: pytest
+          pkg-manager: pip
+          pypi-cache: false
+      - run:
+          name: Run tests
+          command: pytest
+      - run:
+          name: Setup Heroku
+          command: |
+            chmod +x .circleci/setup-heroku.sh
+            .circleci/setup-heroku.sh
+
+      - run:
+          name: Deploy to Heroku
+          command: |
+            cd app/
+            git push heroku master
