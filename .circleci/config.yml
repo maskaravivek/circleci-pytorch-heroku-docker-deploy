@@ -1,37 +1,52 @@
-version: 2.1
-orbs:
-  python: circleci/python@2.1.1
-
-workflows:
-  build-app-with-test:
-    jobs:
-      - build-and-test
 jobs:
-  build-and-test:
+  # Build the docker image and run tests.
+  build_and_test:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/base:2021.07
     steps:
-      - checkout
-      - python/install-packages:
-          pkg-manager: pip
-      - python/install-packages:
-          pip-dependency-file: requirements.txt
-          pkg-manager: pip
-      - python/install-packages:
-          args: pytest
-          pkg-manager: pip
-          pypi-cache: false
-      # - run:
-      #     name: Run tests
-      #     command: pytest
-      - run:
-          name: Setup Heroku
-          command: |
-            chmod +x .circleci/setup_heroku.sh
-            .circleci/setup_heroku.sh
+      # For using docker commands.
+      - setup_remote_docker:
+          version: 19.03.13
 
+      # Build the docker image
+      - checkout
+      - run: docker build -t densenet-inference-heroku .
+
+      # Run tests.
       - run:
-          name: Deploy to Heroku
-          command: |
-            cd app/
-            git push heroku master
+          command: docker run densenet-inference-heroku pytest
+
+  # Build the docker image and deploy it to Heroku.
+  build_and_deploy:
+    docker:
+      - image: cimg/base:2021.07
+    steps:
+      # For using docker commands.
+      - setup_remote_docker:
+          version: 19.03.13
+
+      # Build the docker image
+      - checkout
+      - run: docker build .
+
+      # Deploy to Heroku
+      - heroku/install
+      - run: heroku container:login
+      - heroku/push-docker-image:
+          process-types: web
+      - heroku/release-docker-image:
+          process-types: web
+
+orbs:
+  # For using Heroku CLI commandｓ.
+  heroku: circleci/heroku@1.2.6
+
+version: 2.1
+workflows:
+  heroku_deploy:
+    jobs:
+      - build_and_test
+      - build_and_deploy:
+          requires:
+            # Deploy after testing.
+            - build_and_test
