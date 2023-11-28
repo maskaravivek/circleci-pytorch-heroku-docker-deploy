@@ -1,8 +1,7 @@
 jobs:
   # Build the docker image and run tests.
   build_and_test:
-    docker:
-      - image: cimg/base:2021.07
+    executor: heroku/default
     steps:
       # For using docker commands.
       - setup_remote_docker:
@@ -18,8 +17,7 @@ jobs:
 
   # Build the docker image and deploy it to Heroku.
   build_and_deploy:
-    docker:
-      - image: cimg/base:2021.07
+    executor: heroku/default
     steps:
       # For using docker commands.
       - setup_remote_docker:
@@ -39,7 +37,7 @@ jobs:
 
 orbs:
   # For using Heroku CLI commandｓ.
-  heroku: circleci/heroku@1.2.6
+  heroku: circleci/heroku@2.0
 
 version: 2.1
 workflows:
