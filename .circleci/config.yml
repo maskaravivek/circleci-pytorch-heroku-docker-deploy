@@ -34,6 +34,7 @@ jobs:
           app-name: "densenet-demo-app-circleci"
       - heroku/release-docker-image:
           process-types: web
+          app-name: "densenet-demo-app-circleci"
 
 orbs:
   # For using Heroku CLI commandｓ.
