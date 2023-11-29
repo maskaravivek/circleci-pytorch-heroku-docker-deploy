@@ -30,6 +30,7 @@ jobs:
       - run: heroku container:login
       - heroku/push-docker-image:
           process-types: web
+          app-name: HEROKU_APP_NAME
       - heroku/release-docker-image:
           process-types: web
 
