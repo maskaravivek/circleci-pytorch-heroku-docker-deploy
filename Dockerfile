@@ -1,5 +1,5 @@
 #Create a ubuntu base image with python 3 installed.
-FROM python:3.8
+FROM python:3.8.10-slim-buster
 
 #Set the working directory
 WORKDIR /app/
@@ -8,8 +8,6 @@ WORKDIR /app/
 COPY requirements.txt .
 
 #Install the dependencies
-RUN apt-get --allow-unauthenticated -y update 
-RUN apt-get --allow-unauthenticated install -y python3 python3-pip
 RUN pip3 install -r requirements.txt
 
 COPY . .

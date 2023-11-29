@@ -28,9 +28,10 @@ jobs:
       # Deploy to Heroku
       - heroku/install
       - run: heroku container:login
+      - heroku/check-authentication
       - heroku/push-docker-image:
           process-types: web
-          app-name: HEROKU_APP_NAME
+          app-name: "densenet-demo-app-circleci"
       - heroku/release-docker-image:
           process-types: web
 
