@@ -8,8 +8,8 @@ WORKDIR /app/
 COPY requirements.txt .
 
 #Install the dependencies
-RUN apt-get -y update --allow-unauthenticated
-RUN apt-get install -y python3 python3-pip
+RUN apt-get --allow-unauthenticated -y update 
+RUN apt-get --allow-unauthenticated install -y python3 python3-pip
 RUN pip3 install -r requirements.txt
 
 COPY . .
