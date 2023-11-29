@@ -1,17 +1,25 @@
-#Create a ubuntu base image with python 3 installed.
-FROM python:3.8.10-slim-buster
+FROM python:3.8-slim
+ARG port
 
-#Set the working directory
-WORKDIR /app/
+USER root
 
-#copy all the files
-COPY requirements.txt .
+WORKDIR /opt/app-root/
 
-#Install the dependencies
-RUN pip3 install -r requirements.txt
+ENV PORT=$port
 
-COPY . .
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils \
+    && apt-get -y install curl \
+    && apt-get install libgomp1
 
-EXPOSE 5000
+COPY requirements.txt /opt/app-root/
 
-CMD python app.py
+RUN chgrp -R 0 /opt/app-root/ \
+    && chmod -R g=u /opt/app-root/ \
+    && pip install pip --upgrade \
+    && pip install -r requirements.txt --no-cache-dir
+
+COPY . /opt/app-root/
+
+EXPOSE $PORT
+
+CMD gunicorn app:app --bind 0.0.0.0:$PORT --preload
