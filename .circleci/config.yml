@@ -23,17 +23,10 @@ jobs:
 
       # Build the docker image
       - checkout
-      - run: docker build .
-
       # Deploy to Heroku
       - heroku/install
-      - run: heroku container:login
       - heroku/check-authentication
-      - heroku/push-docker-image:
-          process-types: web
-          app-name: "densenet-demo-app-circleci"
-      - heroku/release-docker-image:
-          process-types: web
+      - heroku/deploy-via-git:
           app-name: "densenet-demo-app-circleci"
 
 orbs:
